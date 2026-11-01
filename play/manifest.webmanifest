@@ -1,0 +1,10 @@
+{
+  "name": "QED Minesweeper",
+  "short_name": "QED",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101318",
+  "theme_color": "#101318",
+  "icons": [{ "src": "TemplateData/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+}

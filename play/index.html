@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QED">
+  <meta name="theme-color" content="#101318">
+  <meta name="description" content="終わりのない盤面。推測はいらない。ブラウザで遊べる QED マインスイーパー / Endless no-guess minesweeper in your browser.">
+  <title>QED Minesweeper</title>
+  <link rel="icon" type="image/png" href="TemplateData/favicon.png">
+  <link rel="apple-touch-icon" href="TemplateData/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="TemplateData/style.css">
+</head>
+<body>
+  <div id="qed-root">
+    <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+  </div>
+  <div id="qed-loading">
+    <img src="TemplateData/icon-192.png" alt="">
+    <div class="bar"><div id="qed-progress"></div></div>
+    <div class="note" id="qed-note">読み込み中…<br>Loading…</div>
+  </div>
+  <div id="qed-hint">クリック：開く ／ 右クリック：旗 ／ ホイール：ズーム ／ ドラッグ：移動 &nbsp;·&nbsp; click: open / right-click: flag / wheel: zoom / drag: pan</div>
+  <div id="qed-error"><div id="qed-error-text"></div></div>
+  <script>
+    var canvas = document.querySelector("#unity-canvas");
+    var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+    document.body.className = mobile ? "mobile" : "desktop";
+
+    function showError(html) {
+      var e = document.querySelector("#qed-error");
+      document.querySelector("#qed-error-text").innerHTML = html;
+      e.style.display = "flex";
+      document.querySelector("#qed-loading").style.display = "none";
+    }
+    function unityShowBanner(msg, type) {
+      if (type == 'error') showError(msg);
+      else console.warn(msg);
+    }
+
+    var buildUrl = "Build";
+    var loaderUrl = buildUrl + "/qedminesweeper.loader.js";
+    var config = {
+      arguments: [],
+      dataUrl: buildUrl + "/qedminesweeper.data.unityweb",
+      frameworkUrl: buildUrl + "/qedminesweeper.framework.js.unityweb",
+      codeUrl: buildUrl + "/qedminesweeper.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "DefaultCompany",
+      productName: "QED Minesweeper",
+      productVersion: "1.1.4",
+      showBanner: unityShowBanner,
+    };
+    // phones: render at most 2x to keep Safari's memory and fill rate in check; the board is flat 2D and stays crisp
+    if (mobile && window.devicePixelRatio > 2) config.devicePixelRatio = 2;
+
+    // no WebGL2 → say so instead of a blank page (old iOS, some in-app browsers)
+    var probe = document.createElement("canvas");
+    if (!(probe.getContext("webgl2"))) {
+      showError("このブラウザでは動きません。Safari や Chrome の最新版で開いてください。<br>This browser cannot run the game. Please open it in a current Safari or Chrome.");
+    } else {
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = function () {
+        createUnityInstance(canvas, config, function (progress) {
+          document.querySelector("#qed-progress").style.width = Math.round(100 * progress) + "%";
+          if (progress >= 0.9) document.querySelector("#qed-note").innerHTML = "準備中…<br>Starting…";
+        }).then(function (unityInstance) {
+          document.querySelector("#qed-loading").style.display = "none";
+          window.qedUnity = unityInstance;
+        }).catch(function (message) {
+          showError("読み込みに失敗しました。ページを再読み込みしてください。<br>Failed to load. Please reload the page.<br><small>" + String(message).replace(/</g, "&lt;") + "</small>");
+        });
+      };
+      script.onerror = function () { showError("読み込みに失敗しました（ネットワーク）。<br>Failed to load (network)."); };
+      document.body.appendChild(script);
+    }
+    // iOS Safari: a stray double-tap would zoom the page; the game handles its own pinch
+    document.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
+    document.addEventListener("dblclick", function (e) { e.preventDefault(); }, { passive: false });
+  </script>
+</body>
+</html>
