@@ -24,7 +24,7 @@
     <div class="bar"><div id="qed-progress"></div></div>
     <div class="note" id="qed-note">読み込み中…<br>Loading…</div>
   </div>
-  <div id="qed-hint"><span>クリック：開く ／ 右クリック：旗 ／ 中クリック：まとめ開け ／ ホイール：ズーム ／ F：旗モード ／ Esc：メニュー</span><button id="qed-full" type="button" title="全画面 / Fullscreen">⛶ 全画面</button></div>
+  <div id="qed-hint">クリック：開く ／ 右クリック：旗 ／ ホイール：ズーム ／ ドラッグ：移動 &nbsp;·&nbsp; click: open / right-click: flag / wheel: zoom / drag: pan</div>
   <div id="qed-error"><div id="qed-error-text"></div></div>
   <script>
     var canvas = document.querySelector("#unity-canvas");
@@ -43,12 +43,12 @@
     }
 
     var buildUrl = "Build";
-    var loaderUrl = buildUrl + "/qedminesweeper.loader.js";
+    var loaderUrl = buildUrl + "/3fadc540ea1c2c5872777891149c7b03.loader.js";
     var config = {
       arguments: [],
-      dataUrl: buildUrl + "/qedminesweeper.data.unityweb",
-      frameworkUrl: buildUrl + "/qedminesweeper.framework.js.unityweb",
-      codeUrl: buildUrl + "/qedminesweeper.wasm.unityweb",
+      dataUrl: buildUrl + "/73f0c2418c8feb2b35b64ca037b8e883.data.unityweb",
+      frameworkUrl: buildUrl + "/bbd11ca9c549fad51cc8328a3283796b.framework.js.unityweb",
+      codeUrl: buildUrl + "/5efef404d6c8d8a9cef62a09dfed3cb5.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "DefaultCompany",
       productName: "QED Minesweeper",
@@ -72,8 +72,6 @@
         }).then(function (unityInstance) {
           document.querySelector("#qed-loading").style.display = "none";
           window.qedUnity = unityInstance;
-          var full = document.querySelector("#qed-full");
-          if (full) full.onclick = function () { unityInstance.SetFullscreen(1); };
         }).catch(function (message) {
           showError("読み込みに失敗しました。ページを再読み込みしてください。<br>Failed to load. Please reload the page.<br><small>" + String(message).replace(/</g, "&lt;") + "</small>");
         });
